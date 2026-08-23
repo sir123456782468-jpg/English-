@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة المعلم | Mr. Sherif Khafagy Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Readex Pro', sans-serif; }
+    .font-eng { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    .dark body { background-color: #090d16; color: #f1f5f9; }
+    .dark .card-style { background: linear-gradient(180deg, #121824 0%, #0d121c 100%); border: 1px solid rgba(255, 255, 255, 0.07); }
+    .dark .inner-box { background-color: #080c14; border-color: #1e293b; }
+
+    body { background-color: #f8fafc; color: #0f172a; }
+    .card-style { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+    .inner-box { background-color: #f1f5f9; border-color: #cbd5e1; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row transition-colors duration-300">
+
+  <!-- Sidebar -->
+  <aside class="w-full md:w-80 card-style p-6 flex flex-col justify-between border-b md:border-b-0 md:border-l dark:border-slate-800/80 border-slate-200">
+    <div>
+      <!-- Header / Theme Toggle -->
+      <div class="flex justify-between items-center mb-6 pb-4 border-b dark:border-slate-800/60 border-slate-200">
+        <span class="text-xs font-semibold text-slate-400">المظهر</span>
+        <button onclick="toggleTheme()" id="themeToggleBtn" class="px-3 py-1.5 rounded-xl inner-box border text-xs font-medium dark:text-amber-400 text-slate-700 hover:border-emerald-500/50 transition">
+          ☀️ الوضع المضيء
+        </button>
+      </div>
+
+      <!-- Teacher Info (مع تغيير الصورة) -->
+      <div class="flex flex-col items-center text-center pb-6 border-b dark:border-slate-800/80 border-slate-200 relative">
+        <div class="relative group cursor-pointer mb-3" onclick="document.getElementById('teacherAvatarInput').click()">
+          <img id="teacherAvatarImg" src="https://ui-avatars.com/api/?name=Sherif+Khafagy&background=10b981&color=090d16&font-size=0.4" class="w-20 h-20 rounded-2xl object-cover border-2 border-emerald-500/30 shadow-xl group-hover:opacity-80 transition" alt="Teacher Avatar">
+          <div class="absolute inset-0 bg-slate-950/60 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs text-white font-medium transition">تغيير الصورة</div>
+          <input type="file" id="teacherAvatarInput" accept="image/*" class="hidden" onchange="uploadTeacherAvatar(event)">
+        </div>
+        <h2 class="font-bold dark:text-white text-slate-900 text-lg">مستر شريف خفاجي</h2>
+        <span class="text-xs text-emerald-500 font-medium mt-0.5">معلم اللغة الإنجليزية</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="space-y-2 mt-6">
+        <button onclick="switchAdminTab('addQuiz')" id="btnAddQuiz" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500 text-slate-950 font-bold text-sm transition shadow-lg shadow-emerald-500/10">
+          <span>➕ إضافة اختبار جديد</span>
+        </button>
+        <button onclick="switchAdminTab('addMaterial')" id="btnAddMaterial" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-emerald-500 font-medium text-sm transition">
+          <span>📁 رفع المذكرات والملفات</span>
+        </button>
+        <button onclick="switchAdminTab('students')" id="btnStudents" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-emerald-500 font-medium text-sm transition">
+          <span>👥 إدارة الطلاب وطردهم</span>
+        </button>
+        <button onclick="switchAdminTab('reports')" id="btnReports" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-emerald-500 font-medium text-sm transition">
+          <span>📊 نتائـج وتقارير الامتحانات</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Logout -->
+    <button onclick="logout()" class="w-full mt-6 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500/20 font-semibold text-xs transition">
+      <span>تسجيل الخروج</span>
+    </button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-6 md:p-10 space-y-8">
+
+    <!-- Overview Stats Banner -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="card-style p-5 rounded-2xl flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl font-bold">🎓</div>
+        <div>
+          <span class="text-xs text-slate-400 block font-medium">إجمالي الطلاب النشطين</span>
+          <span class="text-2xl font-extrabold dark:text-white text-slate-900 font-eng" id="activeStudentsCount">1</span>
+        </div>
+      </div>
+
+      <div class="card-style p-5 rounded-2xl flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl font-bold">📝</div>
+        <div>
+          <span class="text-xs text-slate-400 block font-medium">الاختبارات المنشورة</span>
+          <span class="text-2xl font-extrabold dark:text-white text-slate-900 font-eng">15</span>
+        </div>
+      </div>
+
+      <div class="card-style p-5 rounded-2xl flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl font-bold">📚</div>
+        <div>
+          <span class="text-xs text-slate-400 block font-medium">المذكرات المرفوعة</span>
+          <span class="text-2xl font-extrabold dark:text-white text-slate-900 font-eng">8</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 1: Add Quiz Section -->
+    <section id="addQuizSection" class="card-style p-6 sm:p-8 rounded-3xl space-y-6">
+      <div class="border-b dark:border-slate-800 border-slate-200 pb-4">
+        <h3 class="text-lg font-bold dark:text-white text-slate-900">إنشاء اختبار / كويز جديد</h3>
+        <p class="text-xs text-slate-400 mt-0.5">قم بإدخال تفاصيل الاختبار والأسئلة والاختيارات</p>
+      </div>
+
+      <form id="createQuizForm" onsubmit="handleCreateQuiz(event)" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-2">عنوان الاختبار</label>
+            <input type="text" id="quizTitle" required placeholder="مثال: كويز قواعد Unit 1" class="w-full px-4 py-3 rounded-xl inner-box border text-xs dark:text-white text-slate-900 focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-2">الصف الدراسي</label>
+            <select id="quizGrade" required class="w-full px-4 py-3 rounded-xl inner-box border text-xs dark:text-white text-slate-900 focus:outline-none focus:border-emerald-500">
+              <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+              <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+              <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-2">نوع الاختبار</label>
+            <select id="quizType" required class="w-full px-4 py-3 rounded-xl inner-box border text-xs dark:text-white text-slate-900 focus:outline-none focus:border-emerald-500">
+              <option value="quiz">كويز قصير</option>
+              <option value="exam">امتحان شامل</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-4 pt-4 border-t dark:border-slate-800 border-slate-200">
+          <h4 class="text-sm font-bold text-emerald-500">الأسئلة</h4>
+          
+          <div id="questionsContainer" class="space-y-4">
+            <div class="inner-box p-4 rounded-2xl border space-y-3">
+              <input type="text" placeholder="السؤال الأول (مثال: She _____ to school yesterday)" required class="w-full px-4 py-2.5 rounded-xl border text-xs dark:bg-slate-900 bg-white font-eng focus:outline-none focus:border-emerald-500">
+              
+              <div class="grid grid-cols-2 gap-3">
+                <input type="text" placeholder="اختيار A" required class="px-3 py-2 rounded-lg border text-xs dark:bg-slate-900 bg-white font-eng">
+                <input type="text" placeholder="اختيار B" required class="px-3 py-2 rounded-lg border text-xs dark:bg-slate-900 bg-white font-eng">
+                <input type="text" placeholder="اختيار C" required class="px-3 py-2 rounded-lg border text-xs dark:bg-slate-900 bg-white font-eng">
+                <input type="text" placeholder="اختيار D" required class="px-3 py-2 rounded-lg border text-xs dark:bg-slate-900 bg-white font-eng">
+              </div>
+
+              <div>
+                <label class="text-xs text-slate-400 block mb-1">الإجابة الصحيحة:</label>
+                <select class="w-full px-3 py-2 rounded-lg border text-xs dark:bg-slate-900 bg-white dark:text-white">
+                  <option value="A">الاختيار A</option>
+                  <option value="B">الاختيار B</option>
+                  <option value="C">الاختيار C</option>
+                  <option value="D">الاختيار D</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl transition text-sm shadow-xl shadow-emerald-500/20">
+          حفظ ونشر الاختبار 🚀
+        </button>
+      </form>
+    </section>
+
+    <!-- Tab 2: Add Material Section -->
+    <section id="addMaterialSection" class="card-style p-6 sm:p-8 rounded-3xl space-y-6 hidden">
+      <div class="border-b dark:border-slate-800 border-slate-200 pb-4">
+        <h3 class="text-lg font-bold dark:text-white text-slate-900">رفع مذكرة أو ملخص جديد</h3>
+        <p class="text-xs text-slate-400 mt-0.5">إضافة روابط مذكرات PDF أو ملفات المراجعة</p>
+      </div>
+
+      <form onsubmit="handleAddMaterial(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-400 block mb-2">اسم المذكرة / الملف</label>
+          <input type="text" required placeholder="مثال: مذكرة شرح Unit 1 - Grammar" class="w-full px-4 py-3 rounded-xl inner-box border text-xs dark:text-white text-slate-900 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-2">الصف الدراسي</label>
+            <select required class="w-full px-4 py-3 rounded-xl inner-box border text-xs dark:text-white text-slate-900 focus:outline-none focus:border-emerald-500">
+              <option value="الصف الأول الثانوي">الصف الأول الثانوي</option>
+              <option value="الصف الثاني الثانوي">الصف الثاني الثانوي</option>
+              <option value="الصف الثالث الثانوي">الصف الثالث الثانوي</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-xs font-semibold text-slate-400 block mb-2">رابط التحميل (Google Drive / PDF Link)</label>
+            <input type="url" required placeholder="https://..." class="w-full px-4 py-3 rounded-xl inner-box border text-xs dark:text-white text-slate-900 focus:outline-none focus:border-emerald-500 font-eng">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 rounded-xl transition text-sm shadow-xl shadow-emerald-500/20">
+          رفع المذكرة للطلاب 📁
+        </button>
+      </form>
+    </section>
+
+    <!-- Tab 3: Students Management Section (مع خاصية الطرد) -->
+    <section id="studentsSection" class="card-style p-6 sm:p-8 rounded-3xl space-y-6 hidden">
+      <div class="border-b dark:border-slate-800 border-slate-200 pb-4 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-bold dark:text-white text-slate-900">إدارة الطلاب والتحكم في الحسابات</h3>
+          <p class="text-xs text-slate-400 mt-0.5">يمكنك طرد أي طالب وإلغاء صلاحية دخوله للمنصة نهائياً</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-right text-xs">
+          <thead class="inner-box border-b text-slate-400">
+            <tr>
+              <th class="p-3 font-semibold">اسم الطالب</th>
+              <th class="p-3 font-semibold">الصف الدراسي</th>
+              <th class="p-3 font-semibold">رقم الهاتف</th>
+              <th class="p-3 font-semibold">رقم ولي الأمر</th>
+              <th class="p-3 font-semibold text-center">الإجراء</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y dark:divide-slate-800 border-slate-200" id="studentsListTable">
+            <!-- Dynamic student row -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab 4: Reports Section -->
+    <section id="reportsSection" class="card-style p-6 sm:p-8 rounded-3xl space-y-6 hidden">
+      <div class="border-b dark:border-slate-800 border-slate-200 pb-4">
+        <h3 class="text-lg font-bold dark:text-white text-slate-900">تقارير ونتائج امتحانات الطلاب</h3>
+        <p class="text-xs text-slate-400 mt-0.5">متابعة درجات كل طالب والتفاصيل</p>
+      </div>
+
+      <div class="text-center py-12 text-slate-400 text-sm">
+        لا توجد نتائج اختبارات مسجلة حتى الآن.
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // قائمة بيانات الطلاب الافتراضية
+    let studentsData = [
+      { id: 'phone_01012345678', name: 'أحمد محمد علي', grade: 'الصف الثالث الثانوي', phone: '01012345678', parentPhone: '01198765432', banned: false }
+    ];
+
+    function applyThemeUI(isDark) {
+      const html = document.documentElement;
+      const btn = document.getElementById('themeToggleBtn');
+
+      if (isDark) {
+        html.classList.add('dark');
+        btn.innerText = '☀️ الوضع المضيء';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.classList.remove('dark');
+        btn.innerText = '🌙 الوضع الداكن';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains('dark');
+      applyThemeUI(!isDark);
+    }
+
+    function switchAdminTab(tab) {
+      const tabs = ['addQuiz', 'addMaterial', 'students', 'reports'];
+      tabs.forEach(t => {
+        document.getElementById(t + 'Section').classList.add('hidden');
+        document.getElementById('btn' + t.charAt(0).toUpperCase() + t.slice(1)).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-emerald-500 font-medium text-sm transition";
+      });
+
+      document.getElementById(tab + 'Section').classList.remove('hidden');
+      document.getElementById('btn' + tab.charAt(0).toUpperCase() + tab.slice(1)).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-500 text-slate-950 font-bold text-sm transition shadow-lg shadow-emerald-500/10";
+    }
+
+    function uploadTeacherAvatar(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('teacherAvatarImg').src = e.target.result;
+          localStorage.setItem('teacher_avatar', e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function renderStudentsTable() {
+      const tbody = document.getElementById('studentsListTable');
+      tbody.innerHTML = '';
+
+      let bannedList = JSON.parse(localStorage.getItem('banned_students') || '[]');
+
+      studentsData.forEach(student => {
+        const isBanned = bannedList.includes(student.phone);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3 font-bold dark:text-white text-slate-900">${student.name}</td>
+          <td class="p-3 text-emerald-500">${student.grade}</td>
+          <td class="p-3 font-eng">${student.phone}</td>
+          <td class="p-3 font-eng">${student.parentPhone}</td>
+          <td class="p-3 text-center">
+            ${isBanned ? 
+              `<span class="px-3 py-1 rounded-lg bg-rose-500/10 text-rose-500 text-xs font-bold border border-rose-500/20">مطـرود 🚫</span>` : 
+              `<button onclick="banStudent('${student.phone}')" class="px-3 py-1 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs transition">طرد من المنصة ⛔</button>`
+            }
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('activeStudentsCount').innerText = studentsData.filter(s => !bannedList.includes(s.phone)).length;
+    }
+
+    function banStudent(phone) {
+      if (confirm('هل أنت تأكد من طرد هذا الطالب نهائياً من المنصة؟')) {
+        let bannedList = JSON.parse(localStorage.getItem('banned_students') || '[]');
+        if (!bannedList.includes(phone)) {
+          bannedList.push(phone);
+          localStorage.setItem('banned_students', JSON.stringify(bannedList));
+        }
+        alert('تم طرد الطالب وحظره من الدخول للمنصة!');
+        renderStudentsTable();
+      }
+    }
+
+    function handleCreateQuiz(e) {
+      e.preventDefault();
+      alert('تم إضافة الاختبار بنجاح وسيظهر للطلاب فوراً!');
+    }
+
+    function handleAddMaterial(e) {
+      e.preventDefault();
+      alert('تم رفع المذكرة بنجاح!');
+    }
+
+    function logout() {
+      localStorage.removeItem('sherif_academy_user');
+      window.location.href = 'index.html';
+    }
+
+    window.onload = function() {
+      const savedTheme = localStorage.getItem('theme');
+      applyThemeUI(savedTheme !== 'light');
+
+      const savedAvatar = localStorage.getItem('teacher_avatar');
+      if(savedAvatar) document.getElementById('teacherAvatarImg').src = savedAvatar;
+
+      renderStudentsTable();
+    };
+  </script>
+</body>
+</html>
