@@ -76,7 +76,7 @@
 
   <script>
     const ADMIN_PHONE = "01113075084";
-    const ADMIN_PASSWORD = "mohamed1262099";
+    const ADMIN_PASSWORD = "123456789"; // تم التغيير لـ 123456789
 
     function togglePasswordVisibility(inputId) {
       const input = document.getElementById(inputId);
@@ -102,14 +102,14 @@
       const phone = document.getElementById('loginPhone').value.trim();
       const pass = document.getElementById('loginPassword').value.trim();
 
-      // التحقق من دخول الأدمن
+      // دخول الأدمن
       if (phone === ADMIN_PHONE && pass === ADMIN_PASSWORD) {
         localStorage.setItem('sherif_academy_role', 'admin');
         window.location.href = 'admin-dashboard.html';
         return;
       }
 
-      // التحقق من حسابات الطلاب
+      // دخول الطالب
       const students = JSON.parse(localStorage.getItem('registered_students') || '[]');
       const student = students.find(s => s.phone === phone && s.password === pass);
 
