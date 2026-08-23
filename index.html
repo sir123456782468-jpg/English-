@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تسجيل الدخول | Mr. Sherif Khafagy Academy</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { darkMode: 'class' }
-  </script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
   <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Readex Pro', sans-serif; background-color: #090d16; color: #f1f5f9; }
@@ -23,26 +21,29 @@
       <p class="text-xs text-emerald-500 font-medium">أكاديمية اللغة الإنجليزية</p>
     </div>
 
-    <!-- Tab Toggle / أزرار التنقل بين التسجيل والدخول -->
+    <!-- أزرار التنقل -->
     <div class="flex rounded-xl bg-slate-900 p-1 border border-slate-800">
-      <button onclick="toggleForm('login')" id="tabLogin" class="w-1/2 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 transition">تسجيل دخول</button>
-      <button onclick="toggleForm('register')" id="tabRegister" class="w-1/2 py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition">طالب جديد</button>
+      <button type="button" onclick="toggleForm('login')" id="tabLogin" class="w-1/2 py-2 text-xs font-bold rounded-lg bg-emerald-500 text-slate-950 transition">تسجيل دخول</button>
+      <button type="button" onclick="toggleForm('register')" id="tabRegister" class="w-1/2 py-2 text-xs font-bold rounded-lg text-slate-400 hover:text-white transition">طالب جديد</button>
     </div>
 
-    <!-- Login Form / نموذج تسجيل الدخول -->
+    <!-- نموذج تسجيل الدخول -->
     <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
       <div>
         <label class="text-xs font-semibold text-slate-400 block mb-1.5">رقم الهاتف</label>
-        <input type="tel" id="loginPhone" required placeholder="01012345678" class="w-full px-4 py-3 rounded-xl inner-box border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-500">
+        <input type="tel" id="loginPhone" required placeholder="01113075084" autocomplete="username" class="w-full px-4 py-3 rounded-xl inner-box border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-500">
       </div>
       <div>
         <label class="text-xs font-semibold text-slate-400 block mb-1.5">كلمة السر</label>
-        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl inner-box border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-500">
+        <div class="relative">
+          <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password" class="w-full px-4 py-3 rounded-xl inner-box border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-500 pl-10">
+          <button type="button" onclick="togglePasswordVisibility('loginPassword')" class="absolute left-3 top-2.5 text-slate-400 text-xs">👁️</button>
+        </div>
       </div>
       <button type="submit" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-lg shadow-emerald-500/10">دخول المنصة 🚀</button>
     </form>
 
-    <!-- Register Form / نموذج تسجيل طالب جديد -->
+    <!-- نموذج طالب جديد -->
     <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
       <div>
         <label class="text-xs font-semibold text-slate-400 block mb-1.5">الاسم ثلاثي</label>
@@ -74,11 +75,14 @@
   </div>
 
   <script>
-    // 🔑 بيانات حساب المعلم الخاص بك
     const ADMIN_PHONE = "01113075084";
     const ADMIN_PASSWORD = "mohamed1262099";
 
-    // التنقل بين واجهة تسجيل الدخول وطالب جديد
+    function togglePasswordVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
     function toggleForm(type) {
       if(type === 'login') {
         document.getElementById('loginForm').classList.remove('hidden');
@@ -93,20 +97,17 @@
       }
     }
 
-    // معالجة تسجيل الدخول
     function handleLogin(e) {
       e.preventDefault();
       const phone = document.getElementById('loginPhone').value.trim();
       const pass = document.getElementById('loginPassword').value.trim();
 
-      // 1. الدخول بحساب المستر / الأدمن
       if (phone === ADMIN_PHONE && pass === ADMIN_PASSWORD) {
         localStorage.setItem('sherif_academy_role', 'admin');
         window.location.href = 'admin-dashboard.html';
         return;
       }
 
-      // 2. الدخول بحساب طالب
       const students = JSON.parse(localStorage.getItem('registered_students') || '[]');
       const student = students.find(s => s.phone === phone && s.password === pass);
 
@@ -125,13 +126,11 @@
         return;
       }
 
-      // تحويل الطالب المقبول إلى لوحته
       localStorage.setItem('sherif_academy_role', 'student');
       localStorage.setItem('sherif_academy_user', JSON.stringify(student));
       window.location.href = 'student-dashboard.html';
     }
 
-    // معالجة تسجيل طالب جديد
     function handleRegister(e) {
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
@@ -153,6 +152,7 @@
 
       alert('✅ تم إرسال طلب الانضمام بنجاح! سيتم تفعيل حسابك فور موافقة المستر.');
       toggleForm('login');
+      document.getElementById('registerForm').reset();
     }
   </script>
 </body>
